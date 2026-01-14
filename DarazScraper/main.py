@@ -197,9 +197,9 @@ def scrape():
                 return
         
         # Save discovered/loaded categories
-        with open(CATEGORIES_FILE, "w") as f:
-            json.dump(categories, f, indent=2)
-        logger.info(f"✓ Saved {len(categories)} categories to {CATEGORIES_FILE}\n")
+        # with open(CATEGORIES_FILE, "w") as f:
+        #     json.dump(categories, f, indent=2)
+        # logger.info(f"✓ Saved {len(categories)} categories to {CATEGORIES_FILE}\n")
         
     except Exception as e:
         logger.error(f"Error discovering categories: {e}")
@@ -278,6 +278,8 @@ def scrape():
                     
                     logger.info(f"  Page {page_num}: {len(items)} items ({new_count} new) → Total: {len(seen_ids)}")
                     
+                    if page_num == 102:
+                        break
                     # Move to next page
                     page_num += 1
                     
