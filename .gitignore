@@ -1,0 +1,4 @@
+loadDataInDB/
+# DarazScraper/
+venv/
+*.log
