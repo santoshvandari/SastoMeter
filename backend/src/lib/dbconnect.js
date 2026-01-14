@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_DATABASE = process.env.MONGODB_DATABASE;
 const options = {
+    dbName: MONGODB_DATABASE,
     bufferCommands: false,
     maxPoolSize: 10,
     serverSelectionTimeoutMS: 5000,
