@@ -1,36 +1,41 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import dbConnect from '@/lib/dbconnect';
+import priceHistory from '@/models/priceHistory';
 
-// export async function GET(request) {
-//     try {
-//         query = request.url.split("?")[1]
-//         return NextResponse.json({
-//             message: "Hello from Price History" + b
-//         })
-//     } catch (error) {
-//         return NextResponse.json({
-//             message: "Internal Server Error"
-//         }, { status: 500 })
-//     }
-// }
-
-
-export function GET(request) {
-    const searchQuery = request.nextUrl.searchParams
-    const productId = searchQuery.get("id")
-    const countryName = searchQuery.get("country")
-    if (!productId || !countryName) {
-        return NextResponse.json({
-            message: "Product ID and Country Name are required"
-        }, { status: 400 })
-    }
+export async function GET(req) {
     try {
-        // some DB Query
+
+        // 2. Get the 'id' from the query parameters
+        const { searchParams } = new URL(req.url);
+        const productId = searchParams.get('id');
+
+        if (!productId) {
+            return NextResponse.json({ error: "Bad Request" }, { status: 400 });
+        }
+
+        // 1. Establish database connection only after data validated
+        await dbConnect();
+        // 3. Query to fetch price history
+        const history = await priceHistory.find({ productId })
+            .sort({ timestamp: 1 }) // Chronological order for charts
+            .select('price timestamp -_id')
+            .lean();
+
+        if (!history || history.length === 0) {
+            return NextResponse.json({
+                data: { prices_history: [] },
+            }, { status: 404 });
+        }
+
+        // 4. Return formatted response to match your api.ts requirements
         return NextResponse.json({
-            message: "Hello from Price History " + productId+" " + countryName
-        })
+            data: {
+                prices_history: history
+            }
+        });
+
     } catch (error) {
-        return NextResponse.json({
-            message: "Internal Server Error"
-        }, { status: 500 })
+        console.error("Internal Server Error:", error);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
-} 
+}
