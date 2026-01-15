@@ -1,4 +1,4 @@
-LoadDataInMongoDB/
+# LoadPriceHistoryDataInMongoDB/
 # DarazScraper/
 venv/
 *.log

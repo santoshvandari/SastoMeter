@@ -45,9 +45,9 @@ def insert_data_in_collection(db, collection_name: str, data: list) -> bool:
                     filter={"productId": p_id},
                     replacement={
                         "price": p.get("price"),
-                        "productId": p_id,
-                        "productName": p.get("name", "Unknown"),  # Future-proofing
-                        "updatedAt": now,
+                        "product_id": p_id,
+                        "product_name": p.get("name", "Unknown"),  # Future-proofing
+                        "updated_at": now,
                     },
                     upsert=True,
                 )
@@ -83,7 +83,9 @@ def main():
         return
 
     db: MongoClient = connect_mongo_db(MONGODB_URI, MONGODB_DATABASE)
-    files_to_load_path: list = ["./product_ids_part_1.json","./product_ids_part_2.json"]
+    # files_to_load_path: list = ["./product_ids_part_1.json","./product_ids_part_2.json"]
+    # files_to_load_path: list = ["./product_ids_part_2.json"]
+    files_to_load_path = []
     for file_path in files_to_load_path:
         logger.info(f"Checking {file_path}")
         if not os.path.exists(file_path):
@@ -94,11 +96,10 @@ def main():
             logger.info(f"{file_path} doesn't contains data.")
             continue
         logger.info(f"{file_path} contains {len(data)} data")
-        response = insert_data_in_collection(db, "product_list", data[:2])
+        response = insert_data_in_collection(db, "product_list", data)
         if not response:
             logger.error(f"{file_path} data failed to load in database")
         logger.info(f"{file_path} data to load in database successfully.")
-        break
 
 
 if __name__ == "__main__":
