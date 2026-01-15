@@ -99,6 +99,17 @@ def save_items(new_items):
     
     logger.info(f"  ✓ Saved! Total in file: {len(all_items)}")
 
+# def save_items(new_items):
+#     if not new_items:
+#         return
+    
+#     # "a" mode opens the file for appending
+#     with open(OUTPUT_FILE, "a") as f:
+#         for item in new_items:
+#             f.write(json.dumps(item) + "\n")
+    
+#     logger.info(f" ✓ Appended {len(new_items)} items.")
+
 def scrape():
     global driver, collected_items
     
@@ -197,9 +208,9 @@ def scrape():
                 return
         
         # Save discovered/loaded categories
-        with open(CATEGORIES_FILE, "w") as f:
-            json.dump(categories, f, indent=2)
-        logger.info(f"✓ Saved {len(categories)} categories to {CATEGORIES_FILE}\n")
+        # with open(CATEGORIES_FILE, "w") as f:
+        #     json.dump(categories, f, indent=2)
+        # logger.info(f"✓ Saved {len(categories)} categories to {CATEGORIES_FILE}\n")
         
     except Exception as e:
         logger.error(f"Error discovering categories: {e}")
@@ -278,6 +289,8 @@ def scrape():
                     
                     logger.info(f"  Page {page_num}: {len(items)} items ({new_count} new) → Total: {len(seen_ids)}")
                     
+                    if page_num == 102:
+                        break
                     # Move to next page
                     page_num += 1
                     

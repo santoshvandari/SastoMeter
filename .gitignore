@@ -1,4 +1,5 @@
-loadDataInDB/
+LoadDataInMongoDB/
 # DarazScraper/
 venv/
 *.log
+.env
