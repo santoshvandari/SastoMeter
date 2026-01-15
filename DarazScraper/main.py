@@ -99,6 +99,17 @@ def save_items(new_items):
     
     logger.info(f"  ✓ Saved! Total in file: {len(all_items)}")
 
+# def save_items(new_items):
+#     if not new_items:
+#         return
+    
+#     # "a" mode opens the file for appending
+#     with open(OUTPUT_FILE, "a") as f:
+#         for item in new_items:
+#             f.write(json.dumps(item) + "\n")
+    
+#     logger.info(f" ✓ Appended {len(new_items)} items.")
+
 def scrape():
     global driver, collected_items
     
