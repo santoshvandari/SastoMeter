@@ -27,20 +27,20 @@ class API {
                 product_name: item.name || item.itemName || item.title || 'Unknown Product'
             }));
 
-            const response = await fetch(`${this.baseUrl}productpricelist`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload)
-            });
+            // const response = await fetch(`${this.baseUrl}productpricelist`, {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify(payload)
+            // });
 
-            if (!response.ok) {
-                console.error('Failed to send items:', response.statusText);
-                return null;
-            }
+            // if (!response.ok) {
+            //     console.error('Failed to send items:', response.statusText);
+            //     return null;
+            // }
 
-            return await response.json();
+            // return await response.json();
         } catch (error) {
             console.error('Error sending list items:', error);
             return null;

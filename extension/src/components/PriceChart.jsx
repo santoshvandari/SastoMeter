@@ -180,16 +180,16 @@ export default function PriceChart({ priceHistory, width = 600, height = 300 }) 
     if (!priceHistory || priceHistory.length === 0) {
         return (
             <div style={{
+                width: '100%',
                 height: `${height}px`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#f9fafb',
-                borderRadius: '8px',
                 color: '#6b7280',
-                fontSize: '14px'
+                fontSize: '14px',
+                fontWeight: '500'
             }}>
-                No price history available
+                No price history available for this period
             </div>
         );
     }
@@ -200,7 +200,6 @@ export default function PriceChart({ priceHistory, width = 600, height = 300 }) 
             style={{ 
                 maxWidth: '100%', 
                 height: 'auto',
-                borderRadius: '8px',
                 backgroundColor: '#ffffff'
             }}
         />
