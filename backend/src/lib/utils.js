@@ -1,4 +1,4 @@
-export const isNumber = (value) => {
-    return /^\d+$/.test(value);
+export const isDigit = (value) => {
+    return /^\d+(\.\d+)?$/.test(value);
 }
 
