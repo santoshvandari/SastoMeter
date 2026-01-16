@@ -165,7 +165,7 @@ def main():
 
     session = requests.Session()
     counter = 0
-    skip = 450  # up to
+    skip = 10283  # up to
 
     # tqdm handles the progress bar; it works best if the console isn't flooded with logs
     for data in tqdm(
@@ -175,7 +175,7 @@ def main():
         if not product_id:
             continue
         counter += 1
-        if counter <= 450:
+        if counter <= skip:
             continue
         price_history = get_prices_history(SOURCE_API_URL, product_id, session)
 
