@@ -2,13 +2,16 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbconnect';
 import priceHistory from '@/models/priceHistory';
 
+
+String.prototype.isNumber = function(){return /^\d+$/.test(this);}
+
 // Endpoint used to get get price history data
 export async function GET(req) {
     try {
         const { searchParams } = new URL(req.url);
         const productId = searchParams.get('id');
-        if (!productId) {
-            return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
+        if (!productId || !productId.isNumber()) {
+            return NextResponse.json({ error: "Bad Request" }, { status: 400 });
         }
         await dbConnect();
         const oneYearAgo = new Date();
@@ -17,7 +20,7 @@ export async function GET(req) {
             product_id: productId,
             updated_at: { $gte: oneYearAgo }
         })
-            .sort({ updated_at: -1})
+            .sort({ updated_at: -1 })
             .select('price updated_at -_id')
             .lean();
 
