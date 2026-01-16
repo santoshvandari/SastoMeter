@@ -1,4 +1,4 @@
-export const isNumber = (value) => {
+export const isDigit = (value) => {
     return /^\d+$/.test(value);
 }
 

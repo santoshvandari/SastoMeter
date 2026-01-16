@@ -165,8 +165,7 @@ def main():
 
     session = requests.Session()
     counter = 0
-    skip = 10283  # up to
-
+    skip = 69999  # up to
     # tqdm handles the progress bar; it works best if the console isn't flooded with logs
     for data in tqdm(
         product_ids_list, total=total_product_ids, desc="Processing Products"
@@ -181,7 +180,6 @@ def main():
 
         if price_history:
             insert_data_in_collection(db, "price_history", product_id, price_history)
-
 
         # Adjust sleep as needed. 0.5s is usually safe for APIs.
         time.sleep(0.5)
