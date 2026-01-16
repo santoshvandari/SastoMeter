@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const priceHistorySchema = new mongoose.Schema(
     {
         // Unique identifier for the product
-        productId: {
+        product_id: {
             type: String,
             required: true,
             index: true // Essential for fast lookups by product
@@ -14,7 +14,7 @@ const priceHistorySchema = new mongoose.Schema(
             required: true
         },
         // Timestamp
-        timestamp: {
+        updated_at: {
             type: Date,
             default: Date.now,
             index: true // Essential for sorting by time for charts
@@ -38,6 +38,6 @@ const priceHistorySchema = new mongoose.Schema(
 );
 
 // Compound index for optimized queries (e.g., "Get history for Product X between dates Y and Z")
-priceHistorySchema.index({ productId: 1, timestamp: -1 });
+priceHistorySchema.index({ product_id: 1, updated_at: -1 });
 
 export default mongoose.models.priceHistory || mongoose.model('priceHistory', priceHistorySchema, 'price_history');

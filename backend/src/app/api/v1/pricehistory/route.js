@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbconnect';
 import priceHistory from '@/models/priceHistory';
 
-// Endpoint use to Get Price History Data
+// Endpoint used to get get price history data
 export async function GET(req) {
     try {
         const { searchParams } = new URL(req.url);
@@ -19,12 +19,12 @@ export async function GET(req) {
         })
             .sort({ updated_at: -1})
             .select('price updated_at -_id')
-            .lean(10);
+            .lean();
 
         if (!history || history.length === 0) {
             return NextResponse.json({
                 data: { prices_history: [] },
-            }, { status: 200 });
+            }, { status: 404 });
         }
         return NextResponse.json({
             data: {
