@@ -1,4 +1,4 @@
 export const isDigit = (value) => {
-    return /^\d+$/.test(value);
+    return /^\d+(\.\d+)?$/.test(value);
 }
 

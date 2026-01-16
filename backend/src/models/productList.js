@@ -45,7 +45,4 @@ const productListSchema = new mongoose.Schema(
     }
 );
 
-// Compound index for optimized queries (e.g., "Get history for Product X between dates Y and Z")
-productListSchema.index({ product_id: 1, updated_at: -1 });
-
 export default mongoose.models.productList || mongoose.model('productList', productListSchema, 'product_list_temp');

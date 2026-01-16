@@ -6,7 +6,6 @@ const priceHistorySchema = new mongoose.Schema(
         product_id: {
             type: String,
             required: true,
-            index: true // Essential for fast lookups by product
         },
         // Price measurement
         price: {
@@ -17,7 +16,6 @@ const priceHistorySchema = new mongoose.Schema(
         updated_at: {
             type: Date,
             default: Date.now,
-            index: true // Essential for sorting by time for charts
         },
     },
     {
