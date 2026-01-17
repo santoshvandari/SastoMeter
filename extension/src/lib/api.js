@@ -1,10 +1,9 @@
 // Hardcode URL to ensure availability in MAIN world (injected script)
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = 'http://localhost:3000/api/v1/';
 
 class API {
     constructor() {
         this.baseUrl = API_BASE_URL;
-        this.isProd = false;
 
         // Ensure baseUrl ends with /
         if (!this.baseUrl.endsWith('/')) {
@@ -12,17 +11,18 @@ class API {
         }
     }
 
-    setProd(value) {
-        this.isProd = value;
-    }
-
     async sendListItems(items) {
         try {
             const payload = items.map(item => {
                 // Expanded price field support
-                let rawPrice = item.price || item.itemDiscountPrice || item.itemPrice || item.originalPrice || item.priceShow;
+                let rawPrice = item.price || item.itemDiscountPrice || item.itemPrice || item.originalPrice || item.priceShow || item.salePrice;
                 let finalPrice = 0;
 
+                // Handle price objects (some items have price as {priceNumber: 289})
+                if (typeof rawPrice === 'object' && rawPrice !== null) {
+                    rawPrice = rawPrice.priceNumber || rawPrice.price;
+                }
+                
                 if (typeof rawPrice === 'number') {
                     finalPrice = Math.floor(rawPrice);
                 } else if (typeof rawPrice === 'string') {
@@ -33,13 +33,24 @@ class API {
                 }
 
                 // Clean Product ID (ensure digits only)
-                const rawId = item.itemId || "";
+                const rawId = item.itemId || item.nid || "";
                 let cleanProductId = String(rawId).replace(/[^\d]/g, '');
+
+                // Extract image URL
+                const imageUrl = item.image || item.itemImage || item.imageUrl || '';
+                
+                // Extract and fix item URL (add https: if relative)
+                let itemLink = item.itemUrl || item.link || item.itemLink || item.url || '';
+                if (itemLink && itemLink.startsWith('//')) {
+                    itemLink = 'https:' + itemLink;
+                }
 
                 return {
                     product_id: cleanProductId,
                     price: finalPrice,
-                    product_name: item.name || item.itemName || item.title || 'Unknown Product'
+                    product_name: item.name || item.itemName || item.title || 'Unknown Product',
+                    image: imageUrl,
+                    link: itemLink
                 };
             }).filter(p => !isNaN(p.price) && p.price > 0 && p.product_id && /^\d+$/.test(p.product_id)); // Strict filter
 
@@ -52,7 +63,6 @@ class API {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                // credentials: 'include', // Removed to avoid CORS issues
                 body: JSON.stringify(payload)
             });
 

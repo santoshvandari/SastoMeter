@@ -14,6 +14,16 @@ const productListSchema = new mongoose.Schema(
             required: true,
             // index: true // InFuture We use it to search similary product
         },
+        // Product image URL
+        image: {
+            type: String,
+            required: false
+        },
+        // Product page link
+        link: {
+            type: String,
+            required: false
+        },
         // Price measurement
         price: {
             type: Number,
@@ -29,6 +39,7 @@ const productListSchema = new mongoose.Schema(
     {
         // Set the specific collection name
         collection: 'product_list',
+        // collection: 'product_list_dev',
 
          // Disabling Versioning
         versionKey: false,
@@ -46,3 +57,4 @@ const productListSchema = new mongoose.Schema(
 );
 
 export default mongoose.models.productList || mongoose.model('productList', productListSchema, 'product_list');
+// export default mongoose.models.productList || mongoose.model('productList', productListSchema, 'product_list_dev');
