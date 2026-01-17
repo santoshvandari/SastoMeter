@@ -38,8 +38,8 @@ const productListSchema = new mongoose.Schema(
     },
     {
         // Set the specific collection name
-        // collection: 'product_list',
-        collection: 'product_list_dev',
+        collection: 'product_list',
+        // collection: 'product_list_dev',
 
          // Disabling Versioning
         versionKey: false,
@@ -56,5 +56,5 @@ const productListSchema = new mongoose.Schema(
     }
 );
 
-// export default mongoose.models.productList || mongoose.model('productList', productListSchema, 'product_list');
-export default mongoose.models.productList || mongoose.model('productList', productListSchema, 'product_list_dev');
+export default mongoose.models.productList || mongoose.model('productList', productListSchema, 'product_list');
+// export default mongoose.models.productList || mongoose.model('productList', productListSchema, 'product_list_dev');
