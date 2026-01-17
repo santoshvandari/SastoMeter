@@ -14,7 +14,7 @@ export default function PriceHistoryWidget() {
   const [error, setError] = useState(null);
   const [isVisible, setIsVisible] = useState(true);
   const [productId, setProductId] = useState(null);
-  const [selectedPeriod, setSelectedPeriod] = useState(12); // Default to 12 months
+  const [selectedPeriod, setSelectedPeriod] = useState(1); // Default to 12 months
 
   // Fetch price history function
   const fetchPriceHistory = async (pid) => {
@@ -22,26 +22,14 @@ export default function PriceHistoryWidget() {
       setLoading(true);
       setError(null);
 
-      console.log("[BuyHatke Widget] Fetching price history for product:", pid);
-
       const history = await api.getPriceHistory(pid);
-
-      console.log("[BuyHatke Widget] Received price history:", history);
 
       if (history && history.length > 0) {
         setPriceHistory(history);
         setError(null);
-        console.log(
-          "[BuyHatke Widget] Successfully loaded",
-          history.length,
-          "price points"
-        );
       } else {
         setError("No price history available yet. Check back later!");
-        console.log(
-          "[BuyHatke Widget] No price history found for product:",
-          pid
-        );
+  
       }
     } catch (err) {
       console.error("[BuyHatke Widget] Error fetching price history:", err);
@@ -54,13 +42,11 @@ export default function PriceHistoryWidget() {
   useEffect(() => {
     // Only show on Daraz product pages
     if (!isDarazProductPage()) {
-      console.log("[BuyHatke Widget] Not a Daraz product page, hiding widget");
       setIsVisible(false);
       return;
     }
 
     const pid = getProductId();
-    console.log("[BuyHatke Widget] Detected product ID:", pid);
 
     if (!pid) {
       console.error("[BuyHatke Widget] Product ID not found in URL");

@@ -1,70 +1,89 @@
-/**
- * Extract product ID from Daraz URL
- * Daraz product URLs can have these patterns:
- * - https://www.daraz.com.np/products/...-i{productId}.html
- * - https://www.daraz.com.np/products/...-i{productId}-s{skuId}.html
- * 
- * This implementation searches for i[digits] pattern in pathname and takes the last match
- */
-export function getProductId() {
+const getProductId = () => {
     const pattern = /i\d+/g;
     const matches = window.location.pathname.match(pattern);
-    
-    if (matches && matches.length > 0) {
+    if (matches) {
         const match = matches[matches.length - 1];
-        // Remove the 'i' prefix from the match
+        // remove the i from the match
         return match.substring(1);
     }
-    
-    return null;
+    return "";
 }
 
-/**
- * Get host country from URL
- * Examples: daraz.com.np (Nepal), daraz.pk (Pakistan), daraz.com.bd (Bangladesh)
- */
-export function getHostCountry() {
-    const hostname = window.location.hostname;
-    
-    if (hostname.includes('daraz.com.np')) return 'np';
-    if (hostname.includes('daraz.pk')) return 'pk';
-    if (hostname.includes('daraz.com.bd')) return 'bd';
-    if (hostname.includes('daraz.lk')) return 'lk';
-    if (hostname.includes('daraz.com.mm')) return 'mm';
-    
-    return 'unknown';
+const getHostCountry = () => {
+    const arr = window.location.hostname.split(".");
+    const country = arr[arr.length - 1];
+    if (["np", "pk", "bd", "lk"].includes(country))
+        return arr[arr.length - 1];
+    return "";
 }
 
-/**
- * Get item quantity from the page
- */
-export function getItemQuantity() {
-    try {
-        // Try to find quantity input field
-        const quantityInput = document.querySelector('input[type="number"]');
-        if (quantityInput && quantityInput.value) {
-            return parseInt(quantityInput.value, 10);
+const getItemQuantity = () => {
+    const quantityInput = document.getElementById('module_quantity-input');
+    if (quantityInput) {
+        const inputElem = quantityInput.querySelector('input');
+        if (inputElem) {
+            return parseInt(inputElem.value);
         }
-        
-        // Default to 1 if not found
-        return 1;
-    } catch (error) {
-        console.error('Error getting quantity:', error);
-        return 1;
+    }
+    return NaN;
+}
+
+const isExtension = () => {
+    try{
+        return chrome.runtime !== undefined;
+    }
+    catch (err){
+        return true;
     }
 }
 
-/**
- * Check if value is a valid digit string
- */
-export function isDigit(value) {
+const isProd = () => {
+    try{
+        return isExtension() && ('update_url' in chrome.runtime.getManifest());
+    }
+    catch (err){
+        return true;
+    }
+}
+
+const getPrice = () => {
+    try {
+        const priceElem = document.getElementsByClassName("pdp-price")[0];
+        if (!priceElem) return NaN;
+        if (!priceElem.textContent) return NaN;
+        const price = parseInt(
+            priceElem.textContent
+                .replace("Rs.", "")
+                .replace("৳", "")
+                .replaceAll(",", "")
+                .trim()
+        );
+        return price;
+    }
+    catch (err) {
+        return NaN;
+    }
+}
+
+const asleep = (delay) => {
+    return new Promise(resolve => setTimeout(resolve, delay));
+}
+
+export {
+    getProductId,
+    getHostCountry,
+    getPrice,
+    isExtension,
+    isProd,
+    getItemQuantity,
+    asleep
+}
+
+export const isDigit = (value) => {
     return /^\d+$/.test(String(value));
 }
 
-/**
- * Format price with currency
- */
-export function formatPrice(price, currency = 'Rs.') {
+export const formatPrice = (price, currency = 'Rs.') => {
     if (typeof price !== 'number') {
         price = parseFloat(price);
     }
@@ -74,10 +93,7 @@ export function formatPrice(price, currency = 'Rs.') {
     return `${currency} ${price.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 }
 
-/**
- * Format date for display
- */
-export function formatDate(date) {
+export const formatDate = (date) => {
     if (!(date instanceof Date)) {
         date = new Date(date);
     }
@@ -89,10 +105,7 @@ export function formatDate(date) {
     });
 }
 
-/**
- * Calculate price statistics
- */
-export function calculatePriceStats(priceHistory) {
+export const calculatePriceStats = (priceHistory) => {
     if (!priceHistory || priceHistory.length === 0) {
         return {
             current: 0,
@@ -116,10 +129,7 @@ export function calculatePriceStats(priceHistory) {
     };
 }
 
-/**
- * Check if current page is a Daraz product page
- */
-export function isDarazProductPage() {
+export const isDarazProductPage = () => {
     const hostname = window.location.hostname;
     const pathname = window.location.pathname;
     

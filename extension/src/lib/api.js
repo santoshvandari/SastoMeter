@@ -1,18 +1,15 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1/';
-
-console.log('[BuyHatke API] Initializing with base URL:', API_BASE_URL);
+// Hardcode URL to ensure availability in MAIN world (injected script)
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 class API {
     constructor() {
         this.baseUrl = API_BASE_URL;
         this.isProd = false;
-        
+
         // Ensure baseUrl ends with /
         if (!this.baseUrl.endsWith('/')) {
             this.baseUrl += '/';
         }
-        
-        console.log('[BuyHatke API] Base URL configured:', this.baseUrl);
     }
 
     setProd(value) {
@@ -21,26 +18,51 @@ class API {
 
     async sendListItems(items) {
         try {
-            const payload = items.map(item => ({
-                product_id: String(item.itemId),
-                price: Number(item.price || item.itemDiscountPrice || item.itemPrice),
-                product_name: item.name || item.itemName || item.title || 'Unknown Product'
-            }));
+            const payload = items.map(item => {
+                // Expanded price field support
+                let rawPrice = item.price || item.itemDiscountPrice || item.itemPrice || item.originalPrice || item.priceShow;
+                let finalPrice = 0;
 
-            // const response = await fetch(`${this.baseUrl}productpricelist`, {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify(payload)
-            // });
+                if (typeof rawPrice === 'number') {
+                    finalPrice = Math.floor(rawPrice);
+                } else if (typeof rawPrice === 'string') {
+                    // Remove non-digit characters (except dot for decimal check, though we want int)
+                    // Common formats: "Rs. 1,200", "1,200.00"
+                    const digits = rawPrice.replace(/[^\d.]/g, '');
+                    finalPrice = parseInt(digits, 10); // Parse as integer
+                }
 
-            // if (!response.ok) {
-            //     console.error('Failed to send items:', response.statusText);
-            //     return null;
-            // }
+                // Clean Product ID (ensure digits only)
+                const rawId = item.itemId || "";
+                let cleanProductId = String(rawId).replace(/[^\d]/g, '');
 
-            // return await response.json();
+                return {
+                    product_id: cleanProductId,
+                    price: finalPrice,
+                    product_name: item.name || item.itemName || item.title || 'Unknown Product'
+                };
+            }).filter(p => !isNaN(p.price) && p.price > 0 && p.product_id && /^\d+$/.test(p.product_id)); // Strict filter
+
+            if (payload.length === 0) {
+                return null;
+            }
+
+            const response = await fetch(`${this.baseUrl}productpricelist`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // credentials: 'include', // Removed to avoid CORS issues
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                console.error('Failed to send items:', response.statusText);
+                return null;
+            }
+
+            const result = await response.json();
+            return result;
         } catch (error) {
             console.error('Error sending list items:', error);
             return null;
@@ -50,11 +72,8 @@ class API {
     async getPriceHistory(productId) {
         try {
             const url = `${this.baseUrl}pricehistory?id=${productId}`;
-            console.log('[BuyHatke API] Fetching price history from:', url);
-            
+
             const response = await fetch(url);
-            
-            console.log('[BuyHatke API] Response status:', response.status, response.statusText);
 
             if (!response.ok) {
                 console.error('[BuyHatke API] Failed to fetch price history:', response.status, response.statusText);
@@ -62,26 +81,13 @@ class API {
             }
 
             const data = await response.json();
-            console.log('[BuyHatke API] Received data:', data);
-            
+
             const priceHistory = data.data?.prices_history || [];
-            console.log('[BuyHatke API] Extracted price history:', priceHistory.length, 'items');
-            
+
             return priceHistory;
         } catch (error) {
-            console.log('[BuyHatke API] Error fetching price history:', error);
-            console.log('[BuyHatke API] Error details:', error.message, error.stack);
+            console.error('[BuyHatke API] Error fetching price history:', error);
             return null;
-        }
-    }
-
-    async ingestClick(data) {
-        try {
-            // This can be extended to track user interactions
-            console.log('Click tracked:', data);
-            // You can add an endpoint for click tracking if needed
-        } catch (error) {
-            console.error('Error tracking click:', error);
         }
     }
 }
