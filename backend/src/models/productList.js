@@ -38,8 +38,8 @@ const productListSchema = new mongoose.Schema(
     },
     {
         // Set the specific collection name
-        collection: 'product_list',
-        // collection: 'product_list_dev',
+        // collection: 'product_list',
+        collection: 'product_list_dev',
 
          // Disabling Versioning
         versionKey: false,

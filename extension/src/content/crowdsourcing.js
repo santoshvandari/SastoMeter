@@ -103,7 +103,7 @@ callWhenBodyIsReady(async () => {
                 await api.sendListItems(processedItems);
             }
             catch (err) {
-                console.error('[BuyHatke] Error processing First Screen Data:', err);
+                console.error('[SastoMeter] Error processing First Screen Data:', err);
             }
         }
     }
