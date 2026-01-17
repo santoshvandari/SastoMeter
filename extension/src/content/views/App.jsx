@@ -8,13 +8,6 @@ function App() {
   useEffect(() => {
     // Check if we're on a Daraz product page
     setIsDarazProduct(isDarazProductPage());
-
-    // Initialize crowdsourcing interceptor
-    import('../crowdsourcing.js').then(() => {
-      console.log('[BuyHatke] Content script initialized');
-    }).catch(err => {
-      console.error('[BuyHatke] Failed to load crowdsourcing:', err);
-    });
   }, []);
 
   if (!isDarazProduct) {

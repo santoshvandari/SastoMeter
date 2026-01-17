@@ -2,148 +2,121 @@ import API from '../lib/api';
 import { getProductId, getHostCountry, getItemQuantity } from '../lib/utils';
 
 const api = new API();
-api.setProd(true);
 
-/**
- * Crowdsourcing Interceptor for Daraz
- * This script intercepts product data from Daraz and sends it to the backend for crowdsourcing
- */
+// This needs to be set because the extension is injected via a script tag.
+// isExtension will return false.
+api.setProd(true); 
 
-// Track user interactions (Add to Cart, Buy Now)
-document.addEventListener('click', (event) => {
-    const productId = getProductId();
-    const hostcountry = getHostCountry();
+// Click listener removed as per user request to forget about ingest.
+// logic to intercept network and page data remains below.
 
-    if (!productId || !hostcountry) return;
 
-    const button = event.target.closest('button');
-
-    if (button) {
-        const buttonText = button.textContent?.toLowerCase().replace(/\s/g, '');
-        
-        if (buttonText === 'addtocart') {
-            const quantity = getItemQuantity();
-            api.ingestClick({
-                type: 'addtocart',
-                id: productId,
-                hostcountry,
-                quantity,
-            });
-        } else if (buttonText === 'buynow') {
-            const quantity = getItemQuantity();
-            api.ingestClick({
-                type: 'buynow',
-                id: productId,
-                hostcountry,
-                quantity,
-            });
-        }
-    }
-});
-
-/**
- * Find items with price data in nested objects/arrays
- */
-const findItems = (data, parent = 'ROOT') => {
+var findItems = (data,parent="ROOT") => {
     const items = [];
+    
+    // handle potential null/non-object
+    if (!data || typeof data !== 'object') return items;
 
-    for (const key of Object.getOwnPropertyNames(data)) {
+    for (const key of Object.getOwnPropertyNames(data)){
+        // console.log(`Exploring ${parent} -> ${key}`);
         if (!data[key]) continue;
 
-        if (Array.isArray(data[key]) && data[key].length > 0) {
-            const condition = (item) => 
-                item.hasOwnProperty('itemId') && 
-                (item.hasOwnProperty('price') || item.hasOwnProperty('itemDiscountPrice'));
-
-            if (data[key].some(condition)) {
-                if (data[key].filter(condition).length > data[key].filter(item => !condition(item)).length) {
-                    const validItems = data[key].filter(condition);
-                    console.log('[BuyHatke]', key, 'Found items:', validItems);
-                    items.push(...validItems);
+        if (Array.isArray(data[key]) && data[key].length > 0){
+            const condition = (item) => item.hasOwnProperty("itemId") && 
+                                        (item.hasOwnProperty("price") || item.hasOwnProperty("itemDiscountPrice"));
+            
+            
+            // Check if all items in array contain keys itemId and itemPrice
+            if (data[key].some(condition)){
+                //console.log("Found some items");
+                    if (data[key].filter(condition).length > data[key].filter(item => !condition(item)).length){
+                        const valid_items = data[key].filter(condition);
+                        console.log(key,"Found items: ",valid_items);
+                        items.push(...valid_items);
+                    }
                 }
-            } else {
-                items.push(...findItems(data[key], `${parent} -> ${key}`));
+            else {
+                // Explore array
+                items.push(...findItems(data[key],`${parent} -> ${key}`));
             }
-        } else if (typeof data[key] === 'object') {
-            items.push(...findItems(data[key], `${parent} -> ${key}`));
+        }
+        else if (typeof data[key] === "object"){
+            items.push(...findItems(data[key],`${parent} -> ${key}`));
         }
     }
-    
     return items;
-};
+}
 
-/**
- * Process and deduplicate items
- */
 const processItems = (items) => {
-    console.log('[BuyHatke] Processing items:', items);
-    
-    // Remove duplicates by merging items with same itemId
+    console.log("Processing items: ",items);
+    // remove duplicates by merging items with same itemId
     const uniqueItems = items.reduce((acc, item) => {
         const existingItem = acc.find((i) => i.itemId === item.itemId);
-        
-        if (existingItem) {
+        if (existingItem){
             Object.keys(item).forEach(key => {
-                if (existingItem[key] === undefined) {
+                if (existingItem[key] === undefined){
                     existingItem[key] = item[key];
                 }
             });
-        } else {
+        }
+        else {
             acc.push(item);
         }
-        
         return acc;
     }, []);
 
-    if (uniqueItems.length !== items.length) {
-        console.log(`[BuyHatke] Duplicate items found | ${items.length} -> ${uniqueItems.length}`);
+    if (uniqueItems.length !== items.length){
+        console.log(`Duplicate items found | ${items.length} -> ${uniqueItems.length}`)
     }
 
-    return uniqueItems;
-};
 
-/**
- * Intercept XMLHttpRequest to capture AJAX responses
- */
-const oldXHROpen = window.XMLHttpRequest.prototype.open;
+    // const hostCountry = getHostCountry();
+    // for (const item of uniqueItems){
+    //     item.hostCountry = hostCountry;
+    // }
+
+    return uniqueItems;
+}
+
+let oldXHROpen = window.XMLHttpRequest.prototype.open;
 window.XMLHttpRequest.prototype.open = function() {
-    this.addEventListener('load', async function() {
+    this.addEventListener("load", async function() {
         const responseBody = this.responseText;
 
-        try {
+        try{
             const url = this.responseURL;
-            
-            if (url.includes('ajax=true')) {
-                console.log('[BuyHatke] Intercepted AJAX request:', url);
+            // test if url contains ajax=true in it
+            if (url.includes("ajax=true")){
+                console.log(url);
             }
 
             const data = JSON.parse(responseBody);
+
             const items = findItems(data);
+
             const processedItems = processItems(items);
 
-            if (items.length > 0) {
+            if (items.length > 0)
                 await api.sendListItems(processedItems);
-                console.log('[BuyHatke] Sent', processedItems.length, 'items to backend');
-            }
-        } catch (err) {
-            // Silently fail for non-JSON responses
+
         }
+        catch (err){
+
+        }
+
     });
-    
     return oldXHROpen.apply(this, arguments);
 };
 
-/**
- * Wait for document.body to be ready
- */
 function callWhenBodyIsReady(callback) {
     if (document.body) {
-        callback();
+        callback();  // If document.body is already available
     } else {
+        // Otherwise, observe mutations on the document
         const observer = new MutationObserver((_, observerInstance) => {
             if (document.body) {
-                callback();
-                observerInstance.disconnect();
+                callback();  // Call the function once body is available
+                observerInstance.disconnect();  // Stop observing
             }
         });
 
@@ -151,35 +124,25 @@ function callWhenBodyIsReady(callback) {
     }
 }
 
-/**
- * Extract initial page data from window.__FIRST_SCREEN_DATA
- */
-const asleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+const asleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 callWhenBodyIsReady(async () => {
     const win = window;
 
-    // Wait for Daraz to populate __FIRST_SCREEN_DATA
-    await asleep(2000);
-    
-    console.log('[BuyHatke] Checking for initial screen data...');
 
-    if (!win.__FIRST_SCREEN_DATA) {
-        console.log('[BuyHatke] No initial screen data found');
-        return;
-    }
+    await asleep(2000);
+    console.log(win.__FIRST_SCREEN_DATA);
+
+    if (!win.__FIRST_SCREEN_DATA) return;
 
     const items = findItems(win.__FIRST_SCREEN_DATA);
-    
-    if (items.length > 0) {
-        try {
+    if (items.length > 0){
+        try{
             const processedItems = processItems(items);
             await api.sendListItems(processedItems);
-            console.log('[BuyHatke] Sent initial', processedItems.length, 'items to backend');
-        } catch (err) {
-            console.error('[BuyHatke] Error sending initial items:', err);
+        }
+        catch (err){
+            console.error(err);
         }
     }
 });
-
-console.log('[BuyHatke] Crowdsourcing interceptor initialized');

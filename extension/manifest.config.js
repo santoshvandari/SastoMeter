@@ -15,10 +15,10 @@ export default defineManifest({
   ],
   host_permissions: [
     '*://*.daraz.com.np/*',
-    '*://*.daraz.pk/*',
-    '*://*.daraz.com.bd/*',
-    '*://*.daraz.lk/*',
-    '*://*.daraz.com.mm/*',
+    // '*://*.daraz.pk/*',
+    // '*://*.daraz.com.bd/*',
+    // '*://*.daraz.lk/*',
+    // '*://*.daraz.com.mm/*',
   ],
   action: {
     default_icon: {
@@ -26,17 +26,31 @@ export default defineManifest({
     },
     default_popup: 'src/popup/index.html',
   },
-  content_scripts: [{
-    js: ['src/content/main.jsx'],
-    matches: [
-      '*://*.daraz.com.np/*',
-      '*://*.daraz.pk/*',
-      '*://*.daraz.com.bd/*',
-      '*://*.daraz.lk/*',
-      '*://*.daraz.com.mm/*',
-    ],
-    run_at: 'document_end',
-  }],
+  content_scripts: [
+    {
+      js: ['src/content/main.jsx'],
+      matches: [
+        '*://*.daraz.com.np/*',
+        // '*://*.daraz.pk/*',
+        // '*://*.daraz.com.bd/*',
+        // '*://*.daraz.lk/*',
+        // '*://*.daraz.com.mm/*',
+      ],
+      run_at: 'document_end',
+    },
+    {
+      js: ['src/content/crowdsourcing.js'],
+      matches: [
+        '*://*.daraz.com.np/*',
+        // '*://*.daraz.pk/*',
+        // '*://*.daraz.com.bd/*',
+        // '*://*.daraz.lk/*',
+        // '*://*.daraz.com.mm/*',
+      ],
+      run_at: 'document_start',
+      world: 'MAIN',
+    },
+  ],
   side_panel: {
     default_path: 'src/sidepanel/index.html',
   },
