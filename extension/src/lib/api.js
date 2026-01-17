@@ -1,5 +1,5 @@
 // Hardcode URL to ensure availability in MAIN world (injected script)
-const API_BASE_URL = 'http://localhost:3000/api/v1/';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 class API {
     constructor() {
@@ -22,7 +22,7 @@ class API {
                 if (typeof rawPrice === 'object' && rawPrice !== null) {
                     rawPrice = rawPrice.priceNumber || rawPrice.price;
                 }
-                
+
                 if (typeof rawPrice === 'number') {
                     finalPrice = Math.floor(rawPrice);
                 } else if (typeof rawPrice === 'string') {
@@ -38,7 +38,7 @@ class API {
 
                 // Extract image URL
                 const imageUrl = item.image || item.itemImage || item.imageUrl || '';
-                
+
                 // Extract and fix item URL (add https: if relative)
                 let itemLink = item.itemUrl || item.link || item.itemLink || item.url || '';
                 if (itemLink && itemLink.startsWith('//')) {
@@ -86,7 +86,7 @@ class API {
             const response = await fetch(url);
 
             if (!response.ok) {
-                console.error('[BuyHatke API] Failed to fetch price history:', response.status, response.statusText);
+                console.error('[SastoMeter API] Failed to fetch price history:', response.status, response.statusText);
                 return null;
             }
 
@@ -96,7 +96,7 @@ class API {
 
             return priceHistory;
         } catch (error) {
-            console.error('[BuyHatke API] Error fetching price history:', error);
+            console.error('[SastoMeter API] Error fetching price history:', error);
             return null;
         }
     }
@@ -108,7 +108,7 @@ class API {
             const response = await fetch(url);
 
             if (!response.ok) {
-                console.error('[BuyHatke API] Failed to fetch recommendations:', response.status, response.statusText);
+                console.error('[SastoMeter API] Failed to fetch recommendations:', response.status, response.statusText);
                 return null;
             }
 
@@ -116,7 +116,7 @@ class API {
 
             return data.recommended_products || [];
         } catch (error) {
-            console.error('[BuyHatke API] Error fetching recommendations:', error);
+            console.error('[SastoMeter API] Error fetching recommendations:', error);
             return null;
         }
     }

@@ -5,7 +5,7 @@ export default function App() {
     <div className="container">
       <header className="header">
         <div className="logo-area">
-          <h1 className="title">BuyHatke Price Tracker</h1>
+          <h1 className="title">SastoMeter Price Tracker</h1>
         </div>
       </header>
 

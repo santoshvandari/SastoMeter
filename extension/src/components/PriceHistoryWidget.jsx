@@ -35,7 +35,7 @@ export default function PriceHistoryWidget() {
   
       }
     } catch (err) {
-      console.error("[BuyHatke Widget] Error fetching price history:", err);
+      console.error("[SastoMeter Widget] Error fetching price history:", err);
       setError("Failed to load price history. Please try again.");
     } finally {
       setLoading(false);
@@ -52,7 +52,7 @@ export default function PriceHistoryWidget() {
     const pid = getProductId();
 
     if (!pid) {
-      console.error("[BuyHatke Widget] Product ID not found in URL");
+      console.error("[SastoMeter Widget] Product ID not found in URL");
       setError("Product ID not found in URL");
       setLoading(false);
       return;
@@ -75,7 +75,7 @@ export default function PriceHistoryWidget() {
         setRecommendations(recs);
       }
     } catch (err) {
-      console.error("[BuyHatke Widget] Error fetching recommendations:", err);
+      console.error("[SastoMeter Widget] Error fetching recommendations:", err);
     } finally {
       setLoadingRecs(false);
     }

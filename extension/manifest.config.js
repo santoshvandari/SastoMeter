@@ -3,11 +3,10 @@ import pkg from './package.json'
 
 export default defineManifest({
   manifest_version: 3,
-  name: 'BuyHatke - Price Tracker',
-  short_name: 'BuyHatke',
+  name: 'SastoMeter - Price Tracker',
+  short_name: 'SastoMeter',
   description: 'Track price history on Daraz and save money with crowdsourced data',
   version: pkg.version,
-  author: "Santosh Bhandari",
   icons: {
     16: 'icon-16.png',
     32: 'icon-32.png',

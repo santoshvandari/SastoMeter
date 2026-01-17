@@ -6,7 +6,7 @@ import App from './views/App.jsx'
 const injectWidget = () => {
   // Create container for our widget
   const container = document.createElement('div')
-  container.id = 'buyhatke-price-tracker'
+  container.id = 'sastometer-price-tracker'
   container.style.cssText = 'width: 100%; max-width: 100%; z-index: 999;'
   
   // Try to find a good insertion point on Daraz product pages

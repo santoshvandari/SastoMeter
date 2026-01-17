@@ -1,4 +1,4 @@
-# BuyHatke - Daraz Price Tracker Extension
+# SastoMeter - Daraz Price Tracker Extension
 
 A browser extension that tracks price history on Daraz (Nepal, Pakistan, Bangladesh, Sri Lanka, Myanmar) and helps you save money through crowdsourced price data.
 
@@ -88,9 +88,9 @@ npm install
 
 3. Create `.env` file:
 ```env
-MONGODB_URI=mongodb://localhost:27017/buyhatke
+MONGODB_URI=mongodb://localhost:27017/sastometer
 # Or use MongoDB Atlas
-# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/buyhatke
+# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/sastometer
 ```
 
 4. Start the backend:
