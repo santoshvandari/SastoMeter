@@ -56,5 +56,8 @@ const productListSchema = new mongoose.Schema(
     }
 );
 
+productListSchema.index({ product_name: 1, price: 1 });
+
+
 export default mongoose.models.productList || mongoose.model('productList', productListSchema, 'product_list');
 // export default mongoose.models.productList || mongoose.model('productList', productListSchema, 'product_list_dev');

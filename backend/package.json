@@ -12,6 +12,8 @@
     "next": "16.1.2"
   },
   "devDependencies": {
+    "dotenv": "^17.2.3",
+    "mongodb": "^7.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.1"
   }
