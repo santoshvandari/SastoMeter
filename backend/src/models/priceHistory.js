@@ -20,7 +20,7 @@ const priceHistorySchema = new mongoose.Schema(
     },
     {
         // Set the specific collection name
-        collection: 'price_history_temp',
+        collection: 'price_history',
         // Disabling Versioning
         versionKey: false,
         // Clean up the output for the API
@@ -38,4 +38,4 @@ const priceHistorySchema = new mongoose.Schema(
 // Compound index for optimized queries (e.g., "Get history for Product X between dates Y and Z")
 priceHistorySchema.index({ product_id: 1, updated_at: -1 });
 
-export default mongoose.models.priceHistory || mongoose.model('priceHistory', priceHistorySchema, 'price_history_temp');
+export default mongoose.models.priceHistory || mongoose.model('priceHistory', priceHistorySchema, 'price_history');
