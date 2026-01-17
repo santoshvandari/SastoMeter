@@ -1,148 +1,142 @@
+// @ts-nocheck
 import API from '../lib/api';
-import { getProductId, getHostCountry, getItemQuantity } from '../lib/utils';
+import { getProductId, getHostCountry, getPrice } from '../lib/utils';
 
 const api = new API();
 
 // This needs to be set because the extension is injected via a script tag.
 // isExtension will return false.
-api.setProd(true); 
+api.setProd(true);
 
-// Click listener removed as per user request to forget about ingest.
-// logic to intercept network and page data remains below.
+const processItems = (items) => {
+    // remove duplicates
+    const uniqueItems = [];
+    const itemIds = new Set();
+    for (const item of items){
+        if (!itemIds.has(item.itemId)){
+            uniqueItems.push(item);
+            itemIds.add(item.itemId);
+        }
+    }
+    return uniqueItems;
+}
 
-
-var findItems = (data,parent="ROOT") => {
+const findItems = (data, parent="ROOT") => {
     const items = [];
-    
-    // handle potential null/non-object
+    // Check if data is object
     if (!data || typeof data !== 'object') return items;
 
     for (const key of Object.getOwnPropertyNames(data)){
-        // console.log(`Exploring ${parent} -> ${key}`);
         if (!data[key]) continue;
-
+        
         if (Array.isArray(data[key]) && data[key].length > 0){
             const condition = (item) => item.hasOwnProperty("itemId") && 
-                                        (item.hasOwnProperty("price") || item.hasOwnProperty("itemDiscountPrice"));
+                                        (item.hasOwnProperty("price") || item.hasOwnProperty("itemDiscountPrice") || item.hasOwnProperty("itemPrice") || item.hasOwnProperty("originalPrice") || item.hasOwnProperty("priceShow"));
             
-            
-            // Check if all items in array contain keys itemId and itemPrice
             if (data[key].some(condition)){
-                //console.log("Found some items");
-                    if (data[key].filter(condition).length > data[key].filter(item => !condition(item)).length){
-                        const valid_items = data[key].filter(condition);
-                        console.log(key,"Found items: ",valid_items);
+                    // Filter based on condition density
+                    const valid_items = data[key].filter(condition);
+                    const invalid_count = data[key].length - valid_items.length;
+                    
+                    if (valid_items.length > invalid_count){
                         items.push(...valid_items);
                     }
                 }
             else {
-                // Explore array
-                items.push(...findItems(data[key],`${parent} -> ${key}`));
+                items.push(...findItems(data[key], `${parent} -> ${key}`));
             }
         }
         else if (typeof data[key] === "object"){
-            items.push(...findItems(data[key],`${parent} -> ${key}`));
+            items.push(...findItems(data[key], `${parent} -> ${key}`));
         }
     }
     return items;
 }
 
-const processItems = (items) => {
-    console.log("Processing items: ",items);
-    // remove duplicates by merging items with same itemId
-    const uniqueItems = items.reduce((acc, item) => {
-        const existingItem = acc.find((i) => i.itemId === item.itemId);
-        if (existingItem){
-            Object.keys(item).forEach(key => {
-                if (existingItem[key] === undefined){
-                    existingItem[key] = item[key];
-                }
-            });
-        }
-        else {
-            acc.push(item);
-        }
-        return acc;
-    }, []);
-
-    if (uniqueItems.length !== items.length){
-        console.log(`Duplicate items found | ${items.length} -> ${uniqueItems.length}`)
-    }
-
-
-    // const hostCountry = getHostCountry();
-    // for (const item of uniqueItems){
-    //     item.hostCountry = hostCountry;
-    // }
-
-    return uniqueItems;
-}
 
 let oldXHROpen = window.XMLHttpRequest.prototype.open;
 window.XMLHttpRequest.prototype.open = function() {
     this.addEventListener("load", async function() {
         const responseBody = this.responseText;
-
         try{
-            const url = this.responseURL;
-            // test if url contains ajax=true in it
-            if (url.includes("ajax=true")){
-                console.log(url);
-            }
-
+            // Verify if response is JSON
             const data = JSON.parse(responseBody);
-
+            
             const items = findItems(data);
-
-            const processedItems = processItems(items);
-
-            if (items.length > 0)
+            if (items.length > 0) {
+                const processedItems = processItems(items);
                 await api.sendListItems(processedItems);
-
+            }
         }
         catch (err){
-
+            // Ignore non-JSON responses
         }
-
     });
     return oldXHROpen.apply(this, arguments);
 };
 
 function callWhenBodyIsReady(callback) {
     if (document.body) {
-        callback();  // If document.body is already available
+        callback();
     } else {
-        // Otherwise, observe mutations on the document
-        const observer = new MutationObserver((_, observerInstance) => {
+        const observer = new MutationObserver(function() {
             if (document.body) {
-                callback();  // Call the function once body is available
-                observerInstance.disconnect();  // Stop observing
+                observer.disconnect();
+                callback();
             }
         });
-
-        observer.observe(document.documentElement, { childList: true, subtree: true });
+        observer.observe(document.documentElement, { childList: true });
     }
 }
 
-
 const asleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 callWhenBodyIsReady(async () => {
     const win = window;
 
-
+    // 1. Try __FIRST_SCREEN_DATA scanning
     await asleep(2000);
-    console.log(win.__FIRST_SCREEN_DATA);
-
-    if (!win.__FIRST_SCREEN_DATA) return;
-
-    const items = findItems(win.__FIRST_SCREEN_DATA);
-    if (items.length > 0){
-        try{
-            const processedItems = processItems(items);
-            await api.sendListItems(processedItems);
+    
+    if (win.__FIRST_SCREEN_DATA) {
+        const items = findItems(win.__FIRST_SCREEN_DATA);
+        if (items.length > 0){
+            try{
+                const processedItems = processItems(items);
+                await api.sendListItems(processedItems);
+            }
+            catch (err){
+                console.error('[BuyHatke] Error processing First Screen Data:', err);
+            }
         }
-        catch (err){
-            console.error(err);
+    }
+
+    // 2. Explicitly scan DOM for current product (as User requested for individual product page)
+    const pid = getProductId();
+    if (pid) {
+        // Retry getting price if DOM is slow
+        let retries = 3;
+        let domPrice = NaN;
+        while(retries > 0 && isNaN(domPrice)) {
+            domPrice = getPrice();
+            if (isNaN(domPrice)) await asleep(500);
+            retries--;
+        }
+
+        if (!isNaN(domPrice)) {
+            // Try to find title
+             const titleElem = document.querySelector('.pdp-mod-product-badge-title') || 
+                               document.querySelector('.pdp-product-title') ||
+                               document.querySelector('h1.pdp-title'); // Standard Daraz title class
+             
+             const title = titleElem ? titleElem.textContent.trim() : "Current Product";
+             
+             const domItem = {
+                 itemId: pid,
+                 price: domPrice,
+                 title: title
+             };
+
+             await api.sendListItems([domItem]);
         }
     }
 });

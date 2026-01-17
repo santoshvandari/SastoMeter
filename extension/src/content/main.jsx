@@ -2,8 +2,6 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './views/App.jsx'
 
-console.log('[BuyHatke] Content script loaded')
-
 // Wait for the page to be ready before injecting
 const injectWidget = () => {
   // Create container for our widget
