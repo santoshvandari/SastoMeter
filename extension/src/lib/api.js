@@ -18,9 +18,11 @@ class API {
                 let rawPrice = item.price || item.itemDiscountPrice || item.itemPrice || item.originalPrice || item.priceShow || item.salePrice;
                 let finalPrice = 0;
 
-                if (typeof rawPrice === 'object') {
-                    rawPrice = rawPrice.priceNumber;
+                // Handle price objects (some items have price as {priceNumber: 289})
+                if (typeof rawPrice === 'object' && rawPrice !== null) {
+                    rawPrice = rawPrice.priceNumber || rawPrice.price;
                 }
+                
                 if (typeof rawPrice === 'number') {
                     finalPrice = Math.floor(rawPrice);
                 } else if (typeof rawPrice === 'string') {
@@ -31,13 +33,24 @@ class API {
                 }
 
                 // Clean Product ID (ensure digits only)
-                const rawId = item.itemId || "";
+                const rawId = item.itemId || item.nid || "";
                 let cleanProductId = String(rawId).replace(/[^\d]/g, '');
+
+                // Extract image URL
+                const imageUrl = item.image || item.itemImage || item.imageUrl || '';
+                
+                // Extract and fix item URL (add https: if relative)
+                let itemLink = item.itemUrl || item.link || item.itemLink || item.url || '';
+                if (itemLink && itemLink.startsWith('//')) {
+                    itemLink = 'https:' + itemLink;
+                }
 
                 return {
                     product_id: cleanProductId,
                     price: finalPrice,
-                    product_name: item.name || item.itemName || item.title || 'Unknown Product'
+                    product_name: item.name || item.itemName || item.title || 'Unknown Product',
+                    image: imageUrl,
+                    link: itemLink
                 };
             }).filter(p => !isNaN(p.price) && p.price > 0 && p.product_id && /^\d+$/.test(p.product_id)); // Strict filter
 

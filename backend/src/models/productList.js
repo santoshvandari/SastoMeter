@@ -14,6 +14,16 @@ const productListSchema = new mongoose.Schema(
             required: true,
             // index: true // InFuture We use it to search similary product
         },
+        // Product image URL
+        image: {
+            type: String,
+            required: false
+        },
+        // Product page link
+        link: {
+            type: String,
+            required: false
+        },
         // Price measurement
         price: {
             type: Number,

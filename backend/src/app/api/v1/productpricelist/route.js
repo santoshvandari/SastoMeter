@@ -42,9 +42,29 @@ export async function POST(request) {
                     }
                 }
 
+                // Validate and clean image URL
+                let cleanImage = null;
+                if (item.image && typeof item.image === 'string') {
+                    const imageUrl = item.image.trim();
+                    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+                        cleanImage = imageUrl;
+                    }
+                }
+
+                // Validate and clean product link
+                let cleanLink = null;
+                if (item.link && typeof item.link === 'string') {
+                    const linkUrl = item.link.trim();
+                    if (linkUrl.startsWith('http://') || linkUrl.startsWith('https://')) {
+                        cleanLink = linkUrl;
+                    }
+                }
+
                 incomingDataMap.set(item.product_id, {
                     price: Number(item.price),
-                    name: cleanName
+                    name: cleanName,
+                    image: cleanImage,
+                    link: cleanLink
                 });
             }
         }
@@ -67,7 +87,7 @@ export async function POST(request) {
         const bulkUpdateOps = [];
         const now = new Date();
 
-        incomingDataMap.forEach(({ price, name }, pid) => {
+        incomingDataMap.forEach(({ price, name, image, link }, pid) => {
             const oldPrice = currentPriceMap.get(pid);
 
             if (oldPrice !== undefined && oldPrice === price) return;
@@ -87,6 +107,16 @@ export async function POST(request) {
                 updateDoc.$set.product_name = name;
             } else {
                 updateDoc.$setOnInsert.product_name = "Unknown Product";
+            }
+
+            // Update image if provided
+            if (image) {
+                updateDoc.$set.image = image;
+            }
+
+            // Update link if provided
+            if (link) {
+                updateDoc.$set.link = link;
             }
 
             bulkUpdateOps.push({

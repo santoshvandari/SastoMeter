@@ -127,11 +127,14 @@ callWhenBodyIsReady(async () => {
                 document.querySelector('h1.pdp-title'); // Standard Daraz title class
 
             const title = titleElem ? titleElem.textContent.trim() : "Current Product";
-
+            const image = document.querySelector('.pdp-mod-image-container')?.src || document.querySelector('.pdp-mod-common-image')?.src || "";
+            const link = window.location.href;
             const domItem = {
                 itemId: pid,
                 price: domPrice,
-                title: title
+                title: title,
+                image: image,
+                link: document.URL
             };
             await api.sendListItems([domItem]);
         }
