@@ -14,7 +14,7 @@ export default function PriceHistoryWidget() {
   const [error, setError] = useState(null);
   const [isVisible, setIsVisible] = useState(true);
   const [productId, setProductId] = useState(null);
-  const [selectedPeriod, setSelectedPeriod] = useState(12); // Default to 12 months
+  const [selectedPeriod, setSelectedPeriod] = useState(1); // Default to 12 months
 
   // Fetch price history function
   const fetchPriceHistory = async (pid) => {
