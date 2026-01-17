@@ -1,10 +1,9 @@
 // Hardcode URL to ensure availability in MAIN world (injected script)
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = 'http://localhost:3000/api/v1/';
 
 class API {
     constructor() {
         this.baseUrl = API_BASE_URL;
-        this.isProd = false;
 
         // Ensure baseUrl ends with /
         if (!this.baseUrl.endsWith('/')) {
@@ -12,17 +11,16 @@ class API {
         }
     }
 
-    setProd(value) {
-        this.isProd = value;
-    }
-
     async sendListItems(items) {
         try {
             const payload = items.map(item => {
                 // Expanded price field support
-                let rawPrice = item.price || item.itemDiscountPrice || item.itemPrice || item.originalPrice || item.priceShow;
+                let rawPrice = item.price || item.itemDiscountPrice || item.itemPrice || item.originalPrice || item.priceShow || item.salePrice;
                 let finalPrice = 0;
 
+                if (typeof rawPrice === 'object') {
+                    rawPrice = rawPrice.priceNumber;
+                }
                 if (typeof rawPrice === 'number') {
                     finalPrice = Math.floor(rawPrice);
                 } else if (typeof rawPrice === 'string') {
@@ -52,7 +50,6 @@ class API {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                // credentials: 'include', // Removed to avoid CORS issues
                 body: JSON.stringify(payload)
             });
 
