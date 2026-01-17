@@ -1,11 +1,11 @@
 // Hardcode URL to ensure availability in MAIN world (injected script)
-const API_BASE_URL = 'http://localhost:3000/api/v1/';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 class API {
     constructor() {
         this.baseUrl = API_BASE_URL;
         this.isProd = false;
-        
+
         // Ensure baseUrl ends with /
         if (!this.baseUrl.endsWith('/')) {
             this.baseUrl += '/';
@@ -31,7 +31,7 @@ class API {
                     const digits = rawPrice.replace(/[^\d.]/g, '');
                     finalPrice = parseInt(digits, 10); // Parse as integer
                 }
-                
+
                 // Clean Product ID (ensure digits only)
                 const rawId = item.itemId || "";
                 let cleanProductId = String(rawId).replace(/[^\d]/g, '');
@@ -44,7 +44,7 @@ class API {
             }).filter(p => !isNaN(p.price) && p.price > 0 && p.product_id && /^\d+$/.test(p.product_id)); // Strict filter
 
             if (payload.length === 0) {
-                 return null;
+                return null;
             }
 
             const response = await fetch(`${this.baseUrl}productpricelist`, {
@@ -72,18 +72,18 @@ class API {
     async getPriceHistory(productId) {
         try {
             const url = `${this.baseUrl}pricehistory?id=${productId}`;
-            
+
             const response = await fetch(url);
-            
+
             if (!response.ok) {
                 console.error('[BuyHatke API] Failed to fetch price history:', response.status, response.statusText);
                 return null;
             }
 
             const data = await response.json();
-            
+
             const priceHistory = data.data?.prices_history || [];
-            
+
             return priceHistory;
         } catch (error) {
             console.error('[BuyHatke API] Error fetching price history:', error);
