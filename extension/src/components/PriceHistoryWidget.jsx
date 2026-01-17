@@ -2,6 +2,7 @@ import {useState, useEffect} from "react";
 import API from "../lib/api";
 import {getProductId, isDarazProductPage} from "../lib/utils";
 import PriceChart from "./PriceChart";
+import RecommendedProducts from "./RecommendedProducts";
 
 const api = new API();
 
@@ -14,7 +15,9 @@ export default function PriceHistoryWidget() {
   const [error, setError] = useState(null);
   const [isVisible, setIsVisible] = useState(true);
   const [productId, setProductId] = useState(null);
-  const [selectedPeriod, setSelectedPeriod] = useState(1); // Default to 12 months
+  const [selectedPeriod, setSelectedPeriod] = useState(1); // Default to 1 month
+  const [recommendations, setRecommendations] = useState([]);
+  const [loadingRecs, setLoadingRecs] = useState(true);
 
   // Fetch price history function
   const fetchPriceHistory = async (pid) => {
@@ -57,7 +60,26 @@ export default function PriceHistoryWidget() {
 
     setProductId(pid);
     fetchPriceHistory(pid);
+    
+    // Fetch recommendations
+    fetchRecommendations(pid);
   }, []);
+
+  // Fetch recommendations function
+  const fetchRecommendations = async (pid) => {
+    try {
+      setLoadingRecs(true);
+      const recs = await api.getRecommendations(pid);
+      
+      if (recs && recs.length > 0) {
+        setRecommendations(recs);
+      }
+    } catch (err) {
+      console.error("[BuyHatke Widget] Error fetching recommendations:", err);
+    } finally {
+      setLoadingRecs(false);
+    }
+  };
 
   // Filter price history by selected period
   const getFilteredHistory = () => {
@@ -149,6 +171,12 @@ export default function PriceHistoryWidget() {
           </div>
         )}
       </div>
+      
+      {/* Recommended Products Section */}
+      <RecommendedProducts 
+        recommendations={recommendations} 
+        loading={loadingRecs} 
+      />
     </div>
   );
 }

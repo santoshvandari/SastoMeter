@@ -100,6 +100,26 @@ class API {
             return null;
         }
     }
+
+    async getRecommendations(productId) {
+        try {
+            const url = `${this.baseUrl}recommendation?id=${productId}`;
+
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                console.error('[BuyHatke API] Failed to fetch recommendations:', response.status, response.statusText);
+                return null;
+            }
+
+            const data = await response.json();
+
+            return data.recommended_products || [];
+        } catch (error) {
+            console.error('[BuyHatke API] Error fetching recommendations:', error);
+            return null;
+        }
+    }
 }
 
 export default API;
