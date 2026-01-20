@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Privacy Policy for SastoMeter - Learn how we collect, use, and protect your information when using our price tracking browser extension.">
+    <title>Privacy Policy - SastoMeter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Primary colors from extension */
+            --primary-color: #288cd7;
+            --primary-dark: #1e6aa3;
+            
+            /* Text colors from extension */
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-muted: #6b7280;
+            
+            /* Background colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            
+            /* Accent colors (green theme from extension) */
+            --accent-color: #10b981;
+            --accent-dark: #059669;
+            --accent-light: #ecfdf5;
+            --accent-border: #a7f3d0;
+            
+            /* Border colors */
+            --border-color: #e5e7eb;
+            --border-light: #f3f4f6;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--bg-primary);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>');
+            opacity: 0.3;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .last-updated {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+            color: #eaeaea;
+        }
+
+        .content {
+            padding: 3rem 2rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--primary-color);
+            display: inline-block;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        ul {
+            margin: 1rem 0 1.5rem 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+        }
+
+        li strong {
+            color: var(--text-primary);
+        }
+
+        .info-box {
+            background: var(--accent-light);
+            border: 1px solid var(--accent-border);
+            border-left: 4px solid var(--accent-color);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .info-box p {
+            color: #047857;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            border-left: 4px solid #f59e0b;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .warning-box p {
+            color: #92400e;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        a:hover::after {
+            width: 100%;
+        }
+
+        a:hover {
+            color: var(--primary-dark);
+        }
+
+        .contact-section {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        footer {
+            background: hsl(220, 15%, 25%);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid var(--border-color);
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .content {
+                padding: 2rem 1.5rem;
+            }
+
+            header {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        .section-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            margin-right: 0.75rem;
+            font-weight: 700;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-top: 2.5rem;
+        }
+        .footer-text {
+            color: #eaeaea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Privacy Policy for SastoMeter</h1>
+            <p class="last-updated">Last Updated: January 20, 2026</p>
+        </header>
+
+        <div class="content">
+            <div class="section-header">
+                <span class="section-number">1</span>
+                <h2>Introduction</h2>
+            </div>
+            <p>
+                SastoMeter ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy explains how our browser extension collects, uses, and safeguards your information when you use the SastoMeter service to track product prices on supported e-commerce platforms (currently Daraz).
+            </p>
+            <p>
+                By installing and using SastoMeter, you agree to the collection and use of information in accordance with this policy.
+            </p>
+
+            <div class="section-header">
+                <span class="section-number">2</span>
+                <h2>Information We Collect</h2>
+            </div>
+
+            <h3>A. Crowdsourced Product Data (Anonymous)</h3>
+            <div class="info-box">
+                <p><strong>To function as a community-driven price tracker,</strong> SastoMeter collects specific <strong>non-personal</strong> public data when you visit supported product pages.</p>
+            </div>
+            <ul>
+                <li><strong>What we collect:</strong> Product ID, Product Name, Current Price, Product Image URL, and the URL of the product page.</li>
+                <li><strong>When we collect it:</strong> This data is automatically extracted only when you navigate to a product page on <code>*.daraz.com.np</code>.</li>
+                <li><strong>Why we collect it:</strong> This data is sent to our servers to update the price history graph, helping you and other users identify price drops and deals.</li>
+            </ul>
+
+            <h3>B. User Preferences</h3>
+            <p>
+                We may store strictly necessary local data (using Chrome Storage API) to save your extension settings (e.g., preferred currency or visual themes). This data stays on your device and is not sent to our servers.
+            </p>
+
+            <div class="section-header">
+                <span class="section-number">3</span>
+                <h2>Information We DO NOT Collect</h2>
+            </div>
+            <div class="warning-box">
+                <p><strong>We respect your privacy</strong> and limit data collection to the absolute minimum required for functionality.</p>
+            </div>
+            <ul>
+                <li><strong>No Personally Identifiable Information (PII):</strong> We do not collect your name, email address, physical address, or phone number.</li>
+                <li><strong>No Financial Data:</strong> We never access or store your credit card numbers, bank details, or purchase history.</li>
+                <li><strong>No General Browsing History:</strong> SastoMeter <strong>only</strong> activates on specific e-commerce domains (Daraz). We do not track, store, or view your browsing activity on any other websites (such as social media, email, or search engines).</li>
+            </ul>
+
+            <div class="section-header">
+                <span class="section-number">4</span>
+                <h2>How We Use Your Information</h2>
+            </div>
+            <p>The anonymous product data we collect is used solely for:</p>
+            <ul>
+                <li><strong>Building Price History:</strong> Creating historical price charts for products.</li>
+                <li><strong>Search & Recommendations:</strong> Improving our search engine to help users find products with price drops.</li>
+                <li><strong>Service Maintenance:</strong> Analyzing aggregate data to ensure the extension works correctly on supported sites.</li>
+            </ul>
+
+            <div class="section-header">
+                <span class="section-number">5</span>
+                <h2>Third-Party Sharing</h2>
+            </div>
+            <p>
+                We do not sell, trade, or rent your personal identification information to others. We may share generic aggregated demographic information not linked to any personal identification information regarding visitors and users with our business partners, trusted affiliates, and advertisers for the purposes outlined above.
+            </p>
+
+            <div class="section-header">
+                <span class="section-number">6</span>
+                <h2>Data Security</h2>
+            </div>
+            <div class="info-box">
+                <p>
+                    We implement appropriate data collection, storage, and processing practices and security measures to protect against unauthorized access, alteration, disclosure, or destruction of the data stored on our servers. The communication between the extension and our server is encrypted using SSL (Secure Socket Layer).
+                </p>
+            </div>
+
+            <div class="section-header">
+                <span class="section-number">7</span>
+                <h2>Your Choices</h2>
+            </div>
+            <p>
+                You can stop all collection of information by the extension easily by uninstalling the SastoMeter extension. You may use the standard uninstall processes that may be available as part of your browser marketplace or network.
+            </p>
+
+            <div class="section-header">
+                <span class="section-number">8</span>
+                <h2>Changes to This Privacy Policy</h2>
+            </div>
+            <p>
+                SastoMeter has the discretion to update this privacy policy at any time. When we do, we will revise the updated date at the top of this page. We encourage users to frequently check this page for any changes to stay informed about how we are helping to protect the personal information we collect.
+            </p>
+
+            <div class="section-header">
+                <span class="section-number">9</span>
+                <h2>Contact Us</h2>
+            </div>
+            <div class="contact-section">
+                <p>If you have any questions about this Privacy Policy, the practices of this extension, or your dealings with this extension, please contact us at:</p>
+                <ul>
+                    <li><strong>Email:</strong> <a href="mailto:support@sastometer.com">support@sastometer.com</a></li>
+                    <li><strong>Website:</strong> Coming Soon</li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <p class="footer-text">&copy; 2026 SastoMeter. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
