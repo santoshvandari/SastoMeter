@@ -14,8 +14,7 @@ export default defineManifest({
     128: 'icon-128.png',
   },
   permissions: [
-    'sidePanel',
-    'activeTab',
+    'sidePanel'
   ],
   host_permissions: [
     '*://*.daraz.com.np/*',
