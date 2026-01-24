@@ -1,36 +1,50 @@
-# BuyHatke - Daraz Price Tracker
+# SastoMeter - Daraz Price Tracker & Recommendations
 
-A comprehensive price tracking solution for Daraz e-commerce platform, featuring a browser extension with crowdsourced price data and a Next.js backend API.
+A comprehensive shopping assistant for the Daraz e-commerce platform (Nepal, Pakistan, Bangladesh, Sri Lanka, Myanmar). SastoMeter helps users save money by tracking price history, providing price drop statistics, and intelligently recommending cheaper alternatives for the same product.
 
-## 🎯 Project Overview
+## Key Features
 
-BuyHatke helps shoppers save money by tracking price history on Daraz across multiple countries (Nepal, Pakistan, Bangladesh, Sri Lanka, Myanmar). The system uses crowdsourcing to collect price data from users browsing Daraz, creating a comprehensive price history database.
+### Smart Shopping Assistant (Browser Extension)
+- **Real-time Price History**: View 1-year price history charts directly on product pages.
+- **Cheaper Alternatives**: Automatically finds and suggests the same product from other sellers at a lower price using "Smart Recommendations".
+- **Price Statistics**: Displays current, lowest, highest, and average prices with savings calculation.
+- **Side Panel Support**: Quick access to tracking features via the browser side panel.
+- **Crowdsourced Data**: Automatically contributes to the price database while browsing, helping the community.
+- **Non-Intrusive**: Lightweight and clean UI that blends seamlessly into Daraz.
 
-## 📁 Project Structure
+### Powerful Backend (Next.js API)
+- **High-Performance API**: Built with Next.js 16 and Mongoose 9.
+- **Advanced Search**: Uses MongoDB Atlas Search for fuzzy matching to find product duplicates and recommendations.
+- **Efficient Storage**: Transaction-based updates that only store price *changes* to save space.
+- **Batch Processing**: Handles bulk data submission from the extension efficiently.
+
+### Data Engineering (Python Utilities)
+- **DarazScraper**: Automated Python scrapers to seed the database with initial product and category data.
+- **Bulk Loaders**: Scripts to import large historical datasets into MongoDB.
+
+## Project Structure
 
 ```
-buyhatke/
-├── extension/              # Browser extension (Chrome/Edge)
+SastoMeter/
+├── extension/                      # Browser Extension (React 19 + Vite 7)
 │   ├── src/
-│   │   ├── components/    # React components
-│   │   ├── content/       # Content scripts
-│   │   ├── lib/          # Utilities and API client
-│   │   └── popup/        # Extension popup
-│   └── manifest.config.js
+│   │   ├── components/            # UI Components (Charts, Recommendations)
+│   │   ├── content/               # Content Scripts (Page Injection, scraping)
+│   │   ├── popup/                 # Extension Popup
+│   │   └── sidepanel/             # Side Panel View
+│   └── manifest.config.js         # Manifest V3 Configuration
 │
-├── backend/               # Next.js API backend
+├── backend/                        # API Backend (Next.js 16)
 │   ├── src/
-│   │   ├── app/api/v1/   # API routes
-│   │   ├── models/       # MongoDB schemas
-│   │   └── lib/          # Database connection
-│   └── package.json
+│   │   ├── app/api/v1/            # API Routes (Price History, Recommendations)
+│   │   ├── models/                # Mongoose Models (PriceHistory, ProductList)
+│   │   └── lib/                   # DB Connection, Utils
 │
-├── DarazScraper/         # Python scraper for initial data
-├── LoadPriceHistoryDataInMongoDB/  # Data import utilities
-└── interceptor.ts        # Standalone interceptor script
+├── DarazScraper/                   # Python Scraper for Category/Product Data
+└── LoadPriceHistoryDataInMongoDB/  # Utilities for Bulk Data Loading
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Backend Setup
 
@@ -43,14 +57,13 @@ npm install
 
 # Create .env file
 cat > .env << EOF
-MONGODB_URI=mongodb://localhost:27017/buyhatke
+MONGODB_URI=mongodb+srv://your_connection_string
 EOF
 
-# Start backend
+# Start development server
 npm run dev
 ```
-
-Backend runs on `http://localhost:3000`
+Backend runs on `http://localhost:3000`.
 
 ### 2. Extension Setup
 
@@ -70,348 +83,56 @@ EOF
 npm run build
 ```
 
-### 3. Load Extension
-
-1. Open Chrome/Edge → `chrome://extensions/`
-2. Enable "Developer mode"
-3. Click "Load unpacked"
-4. Select `extension/dist` folder
-
-## 🔍 Code Analysis
-
-### Backend Architecture
-
-**Database Models:**
-
-1. **priceHistory** (`price_history_temp` collection)
-   - Stores historical price points
-   - Fields: `product_id`, `price`, `updated_at`
-   - Indexed on `product_id` and `updated_at` for fast queries
-
-2. **productList** (`product_list_temp` collection)
-   - Stores current product information
-   - Fields: `product_id`, `product_name`, `price`, `updated_at`
-   - Maintains latest price for each product
-
-**API Endpoints:**
-
-1. **GET `/api/v1/pricehistory?id={productId}`**
-   - Fetches price history for last 1 year
-   - Returns sorted by date (oldest to newest)
-   - Used by extension to display charts
-
-2. **POST `/api/v1/productpricelist`**
-   - Accepts batch product data (max 100 items)
-   - Uses MongoDB transactions for consistency
-   - Only creates history entries when prices change
-   - Implements deduplication and validation
-
-**Key Features:**
-- Transaction-based updates for data consistency
-- Efficient batch processing (max 100 items)
-- Price change detection (only logs when price changes)
-- Automatic product name updates
-- Compound indexes for optimized queries
-
-### Interceptor Analysis
-
-The `interceptor.ts` file is a standalone script that demonstrates the crowdsourcing approach:
-
-**Functionality:**
-
-1. **Click Tracking**
-   - Monitors "Add to Cart" and "Buy Now" buttons
-   - Extracts product ID, quantity, and country
-   - Sends interaction data to backend
-
-2. **XHR Interception**
-   - Intercepts all XMLHttpRequest responses
-   - Searches for product data in JSON responses
-   - Looks for objects with `itemId` and `price` fields
-   - Recursively traverses nested objects/arrays
-
-3. **Initial Page Data Extraction**
-   - Captures `window.__FIRST_SCREEN_DATA` from Daraz
-   - Waits 2 seconds for data to populate
-   - Extracts product information on page load
-
-4. **Data Processing**
-   - `findItems()`: Recursively searches for product data
-   - `processItems()`: Deduplicates by `itemId`
-   - Merges partial data from multiple sources
-   - Sends to backend via `api.sendListItems()`
-
-**Data Flow:**
-```
-Daraz Page Load
-    ↓
-window.__FIRST_SCREEN_DATA → findItems() → processItems() → API
-    ↓
-XHR Responses → findItems() → processItems() → API
-    ↓
-User Clicks → Track Interaction → API
-```
-
-### Extension Architecture
-
-**Components:**
-
-1. **PriceHistoryWidget**
-   - Main component rendered on Daraz product pages
-   - Fetches price history from backend
-   - Displays loading/error states
-   - Coordinates PriceChart and PriceStats
-
-2. **PriceChart**
-   - Canvas-based chart rendering
-   - Draws line graph with gradient fill
-   - Shows grid lines and axis labels
-   - Interactive data points
-
-3. **PriceStats**
-   - Displays current, lowest, highest, average prices
-   - Calculates savings from highest price
-   - Shows percentage savings
-
-**Content Script Flow:**
-
-1. `main.jsx` injects widget into Daraz pages
-2. Finds appropriate insertion point (after product title)
-3. Creates React root and renders `App`
-4. `App` checks if on Daraz product page
-5. Loads `crowdsourcing.js` for data collection
-6. Renders `PriceHistoryWidget` if on product page
-
-**Crowdsourcing Implementation:**
-
-The extension implements the same interceptor logic as `interceptor.ts`:
-- XHR interception for AJAX requests
-- Initial page data extraction
-- Click tracking for user interactions
-- Batch data submission to backend
-
-## 🔧 Technical Details
-
-### Crowdsourcing Strategy
-
-**Why Crowdsourcing?**
-- Daraz doesn't provide official price history API
-- Web scraping is unreliable and may violate ToS
-- Crowdsourcing is legal (users share public data they see)
-- More users = more comprehensive data
-
-**How It Works:**
-
-1. **Passive Collection**
-   - Extension runs on all Daraz pages
-   - Intercepts product data from AJAX responses
-   - No additional requests to Daraz servers
-   - Minimal performance impact
-
-2. **Data Extraction**
-   - Daraz loads product data via AJAX
-   - Data contains arrays of products with IDs and prices
-   - Extension extracts this public information
-   - Sends to backend for storage
-
-3. **Privacy Considerations**
-   - Only collects public product data
-   - No personal information collected
-   - No tracking outside Daraz
-   - Transparent to users
-
-### Database Schema
-
-**Price History:**
-```javascript
-{
-  product_id: String,      // Daraz product ID
-  price: Number,           // Price at this point
-  updated_at: Date         // When price was observed
-}
-```
-
-**Product List:**
-```javascript
-{
-  product_id: String,      // Daraz product ID
-  product_name: String,    // Product name
-  price: Number,           // Current price
-  updated_at: Date         // Last update time
-}
-```
-
-### Price Change Detection
-
-The backend only creates history entries when prices change:
-
-```javascript
-// Check if price has changed
-if (oldPrice !== undefined && oldPrice === price) return;
-
-// Only insert if price is different
-historyToInsert.push({
-  product_id: pid,
-  price,
-  updated_at: now
-});
-```
-
-This reduces database size and improves query performance.
-
-## 📊 Data Flow Diagram
-
-```
-┌─────────────────┐
-│  Daraz Website  │
-└────────┬────────┘
-         │
-         ├─→ Page Load → window.__FIRST_SCREEN_DATA
-         │                      ↓
-         │              Extension Interceptor
-         │                      ↓
-         └─→ AJAX Requests → XHR Interception
-                                ↓
-                        Extract Product Data
-                                ↓
-                        POST /api/v1/productpricelist
-                                ↓
-                        ┌───────────────┐
-                        │  Backend API  │
-                        └───────┬───────┘
-                                ↓
-                        Price Change Detection
-                                ↓
-                        ┌───────────────┐
-                        │   MongoDB     │
-                        │ - priceHistory│
-                        │ - productList │
-                        └───────┬───────┘
-                                ↓
-                        GET /api/v1/pricehistory
-                                ↓
-                        Extension Widget
-                                ↓
-                        ┌───────────────┐
-                        │  Price Chart  │
-                        │  Price Stats  │
-                        └───────────────┘
-```
-
-## 🎨 Features
-
-### Extension Features
-- ✅ Real-time price history charts
-- ✅ Price statistics (current, lowest, highest, average)
-- ✅ Savings calculator
-- ✅ Automatic data collection
-- ✅ Works on all Daraz domains
-- ✅ Clean, modern UI
-- ✅ Minimal performance impact
-
-### Backend Features
-- ✅ RESTful API
-- ✅ MongoDB with transactions
-- ✅ Batch processing (up to 100 items)
-- ✅ Price change detection
-- ✅ Data validation
-- ✅ Efficient indexing
-- ✅ Error handling
-
-## 🌍 Supported Regions
-
-- 🇳🇵 **Nepal**: daraz.com.np
-- 🇵🇰 **Pakistan**: daraz.pk
-- 🇧🇩 **Bangladesh**: daraz.com.bd
-- 🇱🇰 **Sri Lanka**: daraz.lk
-- 🇲🇲 **Myanmar**: daraz.com.mm
-
-## 🔐 Security & Privacy
-
-**What We Collect:**
-- Product IDs (public)
-- Product names (public)
-- Product prices (public)
-- Anonymous interaction data
-
-**What We DON'T Collect:**
-- Personal information
-- Login credentials
-- Payment information
-- Browsing history outside Daraz
-
-## 📈 Scalability Considerations
-
-### Current Implementation
-- Batch size limited to 100 items per request
-- Product names limited to 100 words
-- 1 year of price history per product
-- Compound indexes for fast queries
-
-### Future Optimizations
-- Implement caching layer (Redis)
-- Add rate limiting
-- Implement data archiving for old prices
-- Add database sharding for high volume
-- Implement CDN for static assets
-
-## 🐛 Troubleshooting
-
-### Extension Issues
-
-**Widget not appearing:**
-- Check if on Daraz product page
-- Verify extension is enabled
-- Check browser console for errors
-
-**No price history:**
-- Normal for new products
-- Needs crowdsourced data from users
-- Check backend is running
-
-### Backend Issues
-
-**MongoDB connection errors:**
-- Verify MongoDB is running
-- Check `MONGODB_URI` in `.env`
-- Ensure network connectivity
-
-**API errors:**
-- Check backend logs
-- Verify request format
-- Check database permissions
-
-## 🚀 Deployment
-
-### Backend Deployment (Vercel/Railway)
+### 3. Load Extension in Browser
+
+1. Open Chrome/Edge and go to `chrome://extensions/`.
+2. Enable **"Developer mode"** (top right).
+3. Click **"Load unpacked"**.
+4. Select the `extension/dist` folder.
+
+### 4. (Optional) Run Scrapers
+If you want to seed the database with data manually:
 
 ```bash
-# Set environment variables
-MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/buyhatke
-
-# Deploy
-npm run build
+cd DarazScraper
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python main.py
 ```
 
-### Extension Deployment (Chrome Web Store)
+## Architecture & API
 
-1. Build production version: `npm run build`
-2. Create ZIP of `dist` folder
-3. Upload to Chrome Web Store
-4. Submit for review
+### API Endpoints (`/api/v1`)
 
-## 📝 License
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/pricehistory?id={id}` | GET | Returns historical price points for a product. |
+| `/recommendation?id={id}` | GET | Returns cheaper alternatives for a specific product using fuzzy search. |
+| `/productpricelist` | POST | Accepts batch price updates from the extension. |
 
-MIT License - See LICENSE file for details
+### Smart Recommendations Engine
+The recommendation engine uses **MongoDB Atlas Search** to find similar products:
+1. **Fuzzy Matching**: Searches for products with similar names (allowing for typos/variations).
+2. **Price Filter**: Only returns items cheaper than the current product (`price < current_price`).
+3. **Ranking**: Sorts candidates by price (asc) and search relevance score (desc).
 
-## 🤝 Contributing
+### Crowdsourcing Strategy
+1. **Interceptor**: The extension monitors network requests (`XHR`) on Daraz product pages.
+2. **Extraction**: It passively extracts product metadata (ID, Name, Price) from JSON responses without making extra requests.
+3. **Submission**: Data is batched and sent to the SastoMeter backend.
+4. **Privacy**: No personal user data or browsing history outside of Daraz is collected.
 
-Contributions welcome! Please read CONTRIBUTING.md first.
+## Deployment
 
-## 📧 Support
+### Backend
+Deploy to **Vercel** or any Node.js hosting.
+```bash
+npm run build
+npm start
+```
 
-For issues and questions, please open an issue on GitHub.
-
----
-
-**Built with ❤️ for smart shoppers**
+### Extension
+1. Run `npm run build`.
+2. Zip the `dist` folder.
+3. Upload to Chrome/Edge Web Store.
