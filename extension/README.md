@@ -4,26 +4,26 @@ A browser extension that tracks price history on Daraz (Nepal, Pakistan, Banglad
 
 ## Features
 
-### 📊 Price History Chart
+### Price History Chart
 - **Visual Price Tracking**: Beautiful canvas-based chart showing price trends over time
 - **Historical Data**: View up to 1 year of price history
 - **Interactive Display**: Gradient fills, grid lines, and data points for easy reading
 
-### 💰 Price Statistics
+### Price Statistics
 - **Current Price**: See the latest price
 - **Lowest Price**: Know when the product was cheapest
 - **Highest Price**: Understand the price range
 - **Average Price**: Get the mean price over time
 - **Savings Calculator**: See how much you save from the highest price
 
-### 🤝 Crowdsourcing
+### Crowdsourcing
 - **Automatic Data Collection**: Extension automatically captures product prices while you browse
 - **XHR Interception**: Intercepts AJAX requests to extract product data
 - **Initial Page Data**: Captures data from Daraz's `__FIRST_SCREEN_DATA`
 - **Batch Processing**: Efficiently sends data to backend in batches
 - **Privacy-Focused**: Only collects product IDs, names, and prices
 
-### 🎯 User Interaction Tracking
+### User Interaction Tracking
 - **Add to Cart**: Tracks when users add items to cart
 - **Buy Now**: Tracks purchase intent
 - **Quantity Tracking**: Records item quantities
@@ -216,11 +216,11 @@ Submit crowdsourced product data.
 
 ## Supported Daraz Domains
 
-- 🇳🇵 Nepal: `daraz.com.np`
-- 🇵🇰 Pakistan: `daraz.pk`
-- 🇧🇩 Bangladesh: `daraz.com.bd`
-- 🇱🇰 Sri Lanka: `daraz.lk`
-- 🇲🇲 Myanmar: `daraz.com.mm`
+- Nepal: `daraz.com.np`
+<!-- - Pakistan: `daraz.pk`
+- Bangladesh: `daraz.com.bd`
+- Sri Lanka: `daraz.lk`
+- Myanmar: `daraz.com.mm` -->
 
 ## Development
 
@@ -267,13 +267,6 @@ This extension does NOT collect:
 - ❌ Payment information
 - ❌ Login credentials
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-MIT License - feel free to use this project for personal or commercial purposes.
 
 ## Troubleshooting
 
@@ -308,10 +301,3 @@ MIT License - feel free to use this project for personal or commercial purposes.
 - [ ] Multi-language support
 - [ ] Browser notifications
 
-## Support
-
-For issues and questions, please open an issue on GitHub.
-
----
-
-**Made with ❤️ for smart shoppers**
